@@ -1,0 +1,5 @@
+{
+    "receive_directory": "~/Downloads",
+    "discovery_refresh_seconds": 3,
+    "connect_timeout_seconds": 5
+}

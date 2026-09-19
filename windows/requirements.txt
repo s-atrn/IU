@@ -1,0 +1,4 @@
+zeroconf
+win11toast
+pystray
+Pillow

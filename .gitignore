@@ -1,0 +1,61 @@
+# Android / Gradle
+# Local Android SDK configuration
+local.properties
+
+# Gradle generated/cache files
+.gradle/
+**/.gradle/
+
+# Android build outputs
+**/build/
+
+# Android Studio / IntelliJ
+.idea/
+**/.idea/
+
+# Generated APKs / AABs
+*.apk
+*.aab
+
+# Native build output
+.cxx/
+**/.cxx/
+
+# Kotlin / Java
+*.class
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging
+*.egg-info/
+dist/
+build/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code
+.vscode/
+
+#installers/packaging
+dist/
+installer/
+*.apk
+*.exe
+
