@@ -2,6 +2,23 @@
 
 **IU** is a lightweight LAN based wireless file-transfer system for moving files between a Windows PC and Android devices over a local network.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="screenshots/android.jpg" height="400">
+      <br>
+      <b>Android</b>
+    </td>
+    <td align="center">
+      <img src="screenshots/windows.jpeg" height="400">
+      <br>
+      <b>Windows</b>
+    </td>
+  </tr>
+</table>
+
 ## Features
 
 * Wireless file transfer
