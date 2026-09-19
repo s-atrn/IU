@@ -77,19 +77,19 @@ IU is a personal project I created to ease my own workflow. I'm putting it as op
 The core wireless file-transfer functionality is operational, with additional features and improvements being developed over time.
 
 ## Features to add
-- [] Start acceptor at launch in windows
-- [] Right click explorer integration in Windows (with list of devices in the dropdown itself)
-- [] Custom device naming
-- [] Set custom recieved files location
-- [] Folder Transfers -> Directory manifest + individual files transfer
-- [] Drag and drop on windows
-- [] Automatic retry in network failure
-- [] Transfer cancellation (crucial for large file transfers)
-- [] Notification for recieved files on Android even on app acceptor
-- [] Windows app UI redesign to match android ui
+- [ ] Start acceptor at launch in windows
+- [ ] Right click explorer integration in Windows (with list of devices in the dropdown itself)
+- [ ] Custom device naming
+- [ ] Set custom recieved files location
+- [ ] Folder Transfers -> Directory manifest + individual files transfer
+- [ ] Drag and drop on windows
+- [ ] Automatic retry in network failure
+- [ ] Transfer cancellation (crucial for large file transfers)
+- [ ] Notification for recieved files on Android even on app acceptor
+- [ ] Windows app UI redesign to match android ui
 
 ## Bugs to fix
-- [] Multiple recievers on Android
-- [] Scroll not present in Android
-- [] Notification bar lagging when recieving via quick tile reciever
+- [ ] Multiple recievers on Android
+- [ ] Scroll not present in Android
+- [ ] Notification bar lagging when recieving via quick tile reciever
 
