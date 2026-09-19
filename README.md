@@ -25,6 +25,7 @@
 * The PC app is always on the systems tray in the taskbar only so do not expect to find it on the taskbar as an app window.
 * IU Launches on Windows startup and stays in the systems tray so that it can be as accessible as an inbuilt wifi/bluetooth utility.
 * The quick settings tile opens a different IU port while launching the app opens a different independent IU port so if both are turned on you might see 2 entries of the same device in other devices.
+* IU currently does not use encryption for file transfers. It is intended for use on trusted local networks, such as your personal Wi-Fi or a private mobile hotspot. Avoid using IU on untrusted networks, as transferred data could potentially be intercepted.
 
 ## How it works
 
