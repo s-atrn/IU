@@ -8,7 +8,6 @@
 * Transfer single or multiple files
 * Automatic handling of duplicate filenames
 * Device discovery over the local network
-* Device naming
 * No cloud storage required for transfers
 * Available on sharesheet on Android Devices (so you can go file -> share -> IU)
 * Available as a quick settings tile for Android notification panel
@@ -29,7 +28,7 @@
 
 ## How it works
 
-IU uses a local network connection to establish a direct connection between devices and transfer files between them.
+IU uses the available local network to send files between devices connected to the same network.
 
 Files are transferred directly between the devices rather than being uploaded to an external server.
 
