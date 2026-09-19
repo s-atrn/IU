@@ -6,12 +6,12 @@
 
 <table>
   <tr>
-    <td align="center">
+    <td align="center" style="border: none;">
       <img src="screenshots/android.jpg" height="400">
       <br>
       <b>Android</b>
     </td>
-    <td align="center">
+    <td align="center" style="border: none;">
       <img src="screenshots/windows.jpeg" height="400">
       <br>
       <b>Windows</b>
