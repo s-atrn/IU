@@ -1,0 +1,61 @@
+# IU
+
+**IU** is a lightweight LAN based wireless file-transfer system for moving files between a Windows PC and Android devices over a local network.
+
+## Features
+
+* Wireless file transfer
+* Transfer single or multiple files
+* Automatic handling of duplicate filenames
+* Device discovery over the local network
+* Device naming
+* No cloud storage required for transfers
+* Available on sharesheet on Android Devices (so you can go file -> share -> IU)
+* Available as a quick settings tile for Android notification panel
+* Launches on startup on Windows and stays in system tray to make file sharing as seamless as connecting to a wifi.
+* 0 data/quality loss over transfers
+* Faster than bluetooth file transfer
+* Longer range than bluetooth (as much as the wifi being shared)
+
+## Notes for users
+
+* The devices must be on the same network (ie same wifi or via mobile hotspot.)
+* Files are stored in `~/Downloads` on Windows and `~/Downloads/IU` on Android.
+* Uninstalling IU doesn't remove the `~/Downloads/IU` folder from Android so your files aren't lost.
+* The PC app is always on the systems tray in the taskbar only so do not expect to find it on the taskbar as an app window.
+* IU Launches on Windows startup and stays in the systems tray so that it can be as accessible as an inbuilt wifi/bluetooth utility.
+* The quick settings tile opens a different IU port while launching the app opens a different independent IU port so if both are turned on you might see 2 entries of the same device in other devices.
+
+## How it works
+
+IU uses a local network connection to establish a direct connection between devices and transfer files between them.
+
+Files are transferred directly between the devices rather than being uploaded to an external server.
+
+## Project structure
+
+```text
+IU/
+├── android/       # Android application
+├── windows/       # Windows application
+├── README.md
+└── LICENSE
+```
+
+Generated build output, caches, installers and other temporary files are excluded from the repository.
+
+## Releases
+
+Compiled application packages are distributed through **GitHub Releases** rather than being committed to the source repository.
+
+Releases may contain:
+
+* `IU.apk` — Android application
+* `IU Setup.exe` — Windows installer
+
+## Status
+
+IU is a personal project I created to ease my own workflow. I'm putting it as open source on GitHub for others to collaborate their ideas and also for them to use it for themselves.
+
+The core wireless file-transfer functionality is operational, with additional features and improvements being developed over time.
+
