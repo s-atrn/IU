@@ -29,14 +29,17 @@ class IUAcceptor(
     private val onProgress: (String, Long, Long) -> Unit = { _, _, _ -> },
     private val onError: (Exception) -> Unit = {}
 ) {
-
-    private var serverSocket: ServerSocket? = null
+    private var serverSocket:
+        ServerSocket? = null
 
     private val executor =
         Executors.newCachedThreadPool()
 
     private val mainHandler =
         Handler(Looper.getMainLooper())
+
+    private var lastProgressDispatchNanos =
+        0L
 
     @Volatile
     private var running = false
@@ -48,7 +51,6 @@ class IUAcceptor(
         get() = serverSocket?.localPort ?: -1
 
     fun start() {
-
         if (running) {
             return
         }
@@ -56,9 +58,7 @@ class IUAcceptor(
         createNotificationChannel()
 
         executor.execute {
-
             try {
-
                 val socket =
                     ServerSocket(0)
 
@@ -74,9 +74,7 @@ class IUAcceptor(
                 }
 
                 while (running) {
-
                     try {
-
                         val client =
                             socket.accept()
 
@@ -85,7 +83,6 @@ class IUAcceptor(
                         }
 
                     } catch (e: IOException) {
-
                         if (running) {
                             postToMain {
                                 onError(e)
@@ -108,13 +105,11 @@ class IUAcceptor(
     private fun handleClient(
         client: Socket
     ) {
-
         client.use { socket ->
 
             var outputUri: Uri? = null
 
             try {
-
                 socket.tcpNoDelay = true
 
                 val input =
@@ -136,7 +131,8 @@ class IUAcceptor(
 
                 if (
                     filenameLength <= 0 ||
-                    filenameLength > MAX_FILENAME_LENGTH
+                    filenameLength >
+                    MAX_FILENAME_LENGTH
                 ) {
                     throw IOException(
                         "Invalid filename length"
@@ -184,10 +180,11 @@ class IUAcceptor(
                 }
 
                 val fileOutput =
-                    context.contentResolver.openOutputStream(
-                        outputUri,
-                        "w"
-                    )
+                    context.contentResolver
+                        .openOutputStream(
+                            outputUri,
+                            "w"
+                        )
 
                 if (fileOutput == null) {
                     throw IOException(
@@ -216,25 +213,31 @@ class IUAcceptor(
                 output.flush()
 
                 postToMain {
-
                     onFileReceived(
                         filename,
                         outputUri
                     )
                 }
 
+                if (
+                    IUSettings.notificationsEnabled(
+                        context
+                    )
+                ) {
+                    showReceivedNotification(
+                        filename
+                    )
+                }
+
             } catch (e: Exception) {
 
                 if (outputUri != null) {
-
                     try {
-
                         context.contentResolver.delete(
                             outputUri,
                             null,
                             null
                         )
-
                     } catch (_: Exception) {
                     }
                 }
@@ -252,7 +255,6 @@ class IUAcceptor(
         filename: String,
         fileSize: Long
     ) {
-
         val buffer =
             ByteArray(
                 BUFFER_SIZE
@@ -261,10 +263,12 @@ class IUAcceptor(
         var totalReceived =
             0L
 
+        lastProgressDispatchNanos =
+            0L
+
         while (
             totalReceived < fileSize
         ) {
-
             val remaining =
                 fileSize -
                     totalReceived
@@ -283,7 +287,6 @@ class IUAcceptor(
                 )
 
             if (bytesRead == -1) {
-
                 throw IOException(
                     "Connection closed before file was completely received"
                 )
@@ -298,13 +301,27 @@ class IUAcceptor(
             totalReceived +=
                 bytesRead
 
-            postToMain {
+            val now =
+                System.nanoTime()
 
-                onProgress(
-                    filename,
-                    totalReceived,
-                    fileSize
-                )
+            val shouldDispatch =
+                totalReceived >= fileSize ||
+                    now -
+                    lastProgressDispatchNanos >=
+                    PROGRESS_INTERVAL_NANOS
+
+            if (shouldDispatch) {
+
+                lastProgressDispatchNanos =
+                    now
+
+                postToMain {
+                    onProgress(
+                        filename,
+                        totalReceived,
+                        fileSize
+                    )
+                }
             }
         }
 
@@ -314,7 +331,6 @@ class IUAcceptor(
     private fun createPendingFile(
         filename: String
     ): Uri? {
-
         val resolver =
             context.contentResolver
 
@@ -358,10 +374,8 @@ class IUAcceptor(
     private fun finalizeFile(
         uri: Uri
     ) {
-
         val values =
             ContentValues().apply {
-
                 put(
                     MediaStore.Downloads.IS_PENDING,
                     0
@@ -377,7 +391,6 @@ class IUAcceptor(
             )
 
         if (updated == 0) {
-
             throw IOException(
                 "Unable to finalize received file"
             )
@@ -387,7 +400,6 @@ class IUAcceptor(
     private fun getUniqueFilename(
         filename: String
     ): String {
-
         val resolver =
             context.contentResolver
 
@@ -462,7 +474,6 @@ class IUAcceptor(
     private fun getMimeType(
         filename: String
     ): String {
-
         val extension =
             filename
                 .substringAfterLast(
@@ -472,7 +483,6 @@ class IUAcceptor(
                 .lowercase()
 
         return when (extension) {
-
             "jpg",
             "jpeg" ->
                 "image/jpeg"
@@ -540,7 +550,6 @@ class IUAcceptor(
     private fun sanitizeFilename(
         filename: String
     ): String {
-
         val clean =
             filename
                 .replace("\\", "_")
@@ -562,7 +571,6 @@ class IUAcceptor(
     }
 
     private fun createNotificationChannel() {
-
         if (
             Build.VERSION.SDK_INT <
             Build.VERSION_CODES.O
@@ -576,7 +584,6 @@ class IUAcceptor(
                 "Received files",
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-
                 description =
                     "Notifications for files received by IU"
             }
@@ -594,7 +601,6 @@ class IUAcceptor(
     private fun showReceivedNotification(
         filename: String
     ) {
-
         val manager =
             context.getSystemService(
                 Context.NOTIFICATION_SERVICE
@@ -604,12 +610,14 @@ class IUAcceptor(
             Intent(
                 Intent.ACTION_VIEW
             ).apply {
+
                 setDataAndType(
                     Uri.parse(
                         "content://com.android.externalstorage.documents/root/primary"
                     ),
                     "vnd.android.document/directory"
                 )
+
                 addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK
                 )
@@ -669,11 +677,9 @@ class IUAcceptor(
     }
 
     private fun nextNotificationId(): Int {
-
         synchronized(
             NOTIFICATION_LOCK
         ) {
-
             notificationId++
 
             if (
@@ -688,7 +694,6 @@ class IUAcceptor(
     }
 
     fun stop() {
-
         running = false
 
         try {
@@ -700,7 +705,6 @@ class IUAcceptor(
     }
 
     fun shutdown() {
-
         stop()
 
         try {
@@ -712,14 +716,12 @@ class IUAcceptor(
     private fun postToMain(
         action: () -> Unit
     ) {
-
         mainHandler.post {
             action()
         }
     }
 
     companion object {
-
         private const val BUFFER_SIZE =
             64 * 1024
 
@@ -734,6 +736,9 @@ class IUAcceptor(
 
         private const val NOTIFICATION_LOCK =
             "iu_notification_lock"
+
+        private const val PROGRESS_INTERVAL_NANOS =
+            100_000_000L
 
         private var notificationId =
             1000

@@ -8,6 +8,7 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import java.net.InetAddress
+import java.net.NetworkInterface
 
 data class IUDevice(
     val name: String,
@@ -18,9 +19,10 @@ data class IUDevice(
 class NetworkDiscovery(
     private val context: Context,
     private val servicePort: Int,
-    private val onDevicesChanged: (List<IUDevice>) -> Unit
+    private val onDevicesChanged: (List<IUDevice>) -> Unit,
+    private val advertiseSelf: Boolean = true,
+    private val discoverServices: Boolean = true
 ) {
-
     companion object {
         private const val SERVICE_TYPE = "_iu._tcp."
     }
@@ -59,24 +61,25 @@ class NetworkDiscovery(
         String? = null
 
     fun start() {
-
         if (running) {
             return
         }
 
         running = true
-
         devices.clear()
         notifyDevices()
-
         acquireMulticastLock()
 
-        registerService()
-        startDiscovery()
+        if (advertiseSelf) {
+            registerService()
+        }
+
+        if (discoverServices) {
+            startDiscovery()
+        }
     }
 
     private fun acquireMulticastLock() {
-
         if (multicastLock?.isHeld == true) {
             return
         }
@@ -95,7 +98,6 @@ class NetworkDiscovery(
     }
 
     private fun releaseMulticastLock() {
-
         try {
             multicastLock?.let { lock ->
                 if (lock.isHeld) {
@@ -109,7 +111,6 @@ class NetworkDiscovery(
     }
 
     private fun registerService() {
-
         val deviceName =
             buildDeviceName()
 
@@ -160,7 +161,6 @@ class NetworkDiscovery(
     }
 
     private fun startDiscovery() {
-
         discoveryListener =
             object : NsdManager.DiscoveryListener {
 
@@ -172,7 +172,6 @@ class NetworkDiscovery(
                 override fun onServiceFound(
                     service: NsdServiceInfo
                 ) {
-
                     if (
                         service.serviceType !=
                         SERVICE_TYPE
@@ -193,7 +192,6 @@ class NetworkDiscovery(
                 override fun onServiceLost(
                     service: NsdServiceInfo
                 ) {
-
                     devices.remove(
                         service.serviceName
                     )
@@ -210,7 +208,6 @@ class NetworkDiscovery(
                     serviceType: String,
                     errorCode: Int
                 ) {
-
                     try {
                         nsdManager.stopServiceDiscovery(
                             this
@@ -239,9 +236,7 @@ class NetworkDiscovery(
     private fun resolveService(
         service: NsdServiceInfo
     ) {
-
         try {
-
             nsdManager.resolveService(
                 service,
                 object : NsdManager.ResolveListener {
@@ -255,7 +250,6 @@ class NetworkDiscovery(
                     override fun onServiceResolved(
                         resolvedService: NsdServiceInfo
                     ) {
-
                         if (!running) {
                             return
                         }
@@ -263,6 +257,10 @@ class NetworkDiscovery(
                         val host =
                             resolvedService.host
                                 ?: return
+
+                        if (isLocalAddress(host)) {
+                            return
+                        }
 
                         val port =
                             resolvedService.port
@@ -287,8 +285,28 @@ class NetworkDiscovery(
                     }
                 }
             )
-
         } catch (_: Exception) {
+        }
+    }
+
+    private fun isLocalAddress(
+        address: InetAddress
+    ): Boolean {
+        return try {
+            NetworkInterface
+                .getNetworkInterfaces()
+                ?.asSequence()
+                ?.flatMap { networkInterface ->
+                    networkInterface
+                        .inetAddresses
+                        .asSequence()
+                }
+                ?.any { localAddress ->
+                    localAddress.hostAddress ==
+                        address.hostAddress
+                } == true
+        } catch (_: Exception) {
+            false
         }
     }
 
@@ -307,7 +325,6 @@ class NetworkDiscovery(
     }
 
     private fun notifyDevices() {
-
         val snapshot =
             devices.values
                 .sortedBy { it.name }
@@ -319,7 +336,6 @@ class NetworkDiscovery(
     }
 
     fun stop() {
-
         if (!running) {
             return
         }

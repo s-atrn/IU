@@ -1,7 +1,7 @@
 package com.example.iu
 
-import android.app.ComponentCaller
 import android.Manifest
+import android.app.ComponentCaller
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -71,8 +71,6 @@ class MainActivity : ComponentActivity() {
     private var transferProgress by
         mutableStateOf(0f)
 
-    private var acceptor: IUAcceptor? = null
-
     private var discovery: NetworkDiscovery? = null
 
     private val appFont =
@@ -97,13 +95,141 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+    private val acceptorStateReceiver =
+        object : BroadcastReceiver() {
+
+            override fun onReceive(
+                context: Context?,
+                intent: Intent?
+            ) {
+                if (
+                    intent?.action !=
+                    IUAcceptorService.ACTION_STATE_CHANGED
+                ) {
+                    return
+                }
+
+                when (
+                    intent.getStringExtra(
+                        IUAcceptorService.EXTRA_STATE
+                    )
+                ) {
+
+                    IUAcceptorService.STATE_STARTED -> {
+                        val port =
+                            intent.getIntExtra(
+                                IUAcceptorService.EXTRA_PORT,
+                                -1
+                            )
+
+                        statusText =
+                            if (port > 0) {
+                                "Ready • port $port"
+                            } else {
+                                "Ready"
+                            }
+                    }
+
+                    IUAcceptorService.STATE_PROGRESS -> {
+                        val filename =
+                            intent.getStringExtra(
+                                IUAcceptorService.EXTRA_FILENAME
+                            )
+
+                        val received =
+                            intent.getLongExtra(
+                                IUAcceptorService.EXTRA_RECEIVED,
+                                0L
+                            )
+
+                        val total =
+                            intent.getLongExtra(
+                                IUAcceptorService.EXTRA_TOTAL,
+                                0L
+                            )
+
+                        if (filename != null) {
+                            transferFileName =
+                                filename
+
+                            transferProgress =
+                                if (total > 0) {
+                                    (
+                                        received.toFloat() /
+                                            total.toFloat()
+                                    ).coerceIn(
+                                        0f,
+                                        1f
+                                    )
+                                } else {
+                                    0f
+                                }
+                        }
+                    }
+
+                    IUAcceptorService.STATE_COMPLETE -> {
+                        val filename =
+                            intent.getStringExtra(
+                                IUAcceptorService.EXTRA_FILENAME
+                            )
+
+                        if (filename != null) {
+                            statusText =
+                                "Received $filename"
+                        } else {
+                            statusText =
+                                "File received"
+                        }
+
+                        transferFileName =
+                            null
+
+                        transferProgress =
+                            0f
+                    }
+
+                    IUAcceptorService.STATE_ERROR -> {
+                        val error =
+                            intent.getStringExtra(
+                                IUAcceptorService.EXTRA_ERROR
+                            )
+
+                        statusText =
+                            "Error: ${
+                                error
+                                    ?: "Unknown error"
+                            }"
+
+                        transferFileName =
+                            null
+
+                        transferProgress =
+                            0f
+                    }
+
+                    IUAcceptorService.STATE_STOPPED -> {
+                        statusText =
+                            "IU receiver stopped"
+
+                        transferFileName =
+                            null
+
+                        transferProgress =
+                            0f
+                    }
+                }
+            }
+        }
+
     private val filePicker =
         registerForActivityResult(
             ActivityResultContracts.OpenMultipleDocuments()
         ) { uris ->
 
             if (uris.isNotEmpty()) {
-                selectedFileUris = uris
+
+                selectedFileUris =
+                    uris
 
                 selectedFileNames =
                     uris.map { uri ->
@@ -121,8 +247,11 @@ class MainActivity : ComponentActivity() {
         ) { granted ->
 
             if (granted) {
+
                 requestNotificationPermission()
+
             } else {
+
                 statusText =
                     "Nearby Wi-Fi permission required"
             }
@@ -138,6 +267,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
+
         super.onCreate(savedInstanceState)
 
         window.addFlags(
@@ -150,13 +280,15 @@ class MainActivity : ComponentActivity() {
         )
 
         if (hasNetworkPermission()) {
+
             requestNotificationPermission()
+
         } else {
+
             requestNetworkPermission()
         }
 
         restoreTransferState()
-
 
         handleIncomingShareIntent(intent)
 
@@ -173,13 +305,15 @@ class MainActivity : ComponentActivity() {
                             moveTaskToBack(true)
                         }
             ) {
+
                 Box(
-                    modifier = 
+                    modifier =
                         Modifier
                             .fillMaxWidth(0.75f)
                             .fillMaxHeight(0.42f)
                             .align(Alignment.Center)
                 ) {
+
                     Box(
                         modifier =
                             Modifier
@@ -375,7 +509,9 @@ class MainActivity : ComponentActivity() {
 
                                     LinearProgressIndicator(
                                         progress =
-                                            { transferProgress },
+                                            {
+                                                transferProgress
+                                            },
                                         modifier =
                                             Modifier.fillMaxWidth()
                                     )
@@ -447,6 +583,7 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(
         intent: Intent
     ) {
+
         super.onNewIntent(intent)
 
         setIntent(intent)
@@ -459,6 +596,7 @@ class MainActivity : ComponentActivity() {
     private fun handleIncomingShareIntent(
         intent: Intent?
     ) {
+
         if (intent == null) {
             return
         }
@@ -473,6 +611,7 @@ class MainActivity : ComponentActivity() {
                     )
 
                 if (uri != null) {
+
                     setSharedFiles(
                         listOf(uri)
                     )
@@ -492,14 +631,14 @@ class MainActivity : ComponentActivity() {
                     } else {
 
                         @Suppress("DEPRECATION")
+
                         intent.getParcelableArrayListExtra<Uri>(
                             Intent.EXTRA_STREAM
                         )
                     }
 
-                if (
-                    !uris.isNullOrEmpty()
-                ) {
+                if (!uris.isNullOrEmpty()) {
+
                     setSharedFiles(
                         uris
                     )
@@ -511,6 +650,7 @@ class MainActivity : ComponentActivity() {
     private fun setSharedFiles(
         uris: List<Uri>
     ) {
+
         selectedFileUris =
             uris
 
@@ -528,11 +668,17 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onStart() {
+
         super.onStart()
 
-        val filter =
+        val transferFilter =
             IntentFilter(
                 IUTransferService.ACTION_STATE_CHANGED
+            )
+
+        val acceptorFilter =
+            IntentFilter(
+                IUAcceptorService.ACTION_STATE_CHANGED
             )
 
         if (
@@ -542,20 +688,49 @@ class MainActivity : ComponentActivity() {
 
             registerReceiver(
                 transferStateReceiver,
-                filter,
+                transferFilter,
+                Context.RECEIVER_NOT_EXPORTED
+            )
+
+            registerReceiver(
+                acceptorStateReceiver,
+                acceptorFilter,
                 Context.RECEIVER_NOT_EXPORTED
             )
 
         } else {
 
             @Suppress("DEPRECATION")
+
             registerReceiver(
                 transferStateReceiver,
-                filter
+                transferFilter
+            )
+
+            @Suppress("DEPRECATION")
+
+            registerReceiver(
+                acceptorStateReceiver,
+                acceptorFilter
             )
         }
 
         restoreTransferState()
+
+        if (
+            IUAcceptorService.isRunning()
+        ) {
+
+            val port =
+                IUAcceptorService.getActivePort()
+
+            statusText =
+                if (port > 0) {
+                    "Ready • port $port"
+                } else {
+                    "Ready"
+                }
+        }
     }
 
     override fun onStop() {
@@ -567,11 +742,17 @@ class MainActivity : ComponentActivity() {
         } catch (_: Exception) {
         }
 
+        try {
+            unregisterReceiver(
+                acceptorStateReceiver
+            )
+        } catch (_: Exception) {
+        }
+
         super.onStop()
     }
 
     private fun restoreTransferState() {
-
 
         val liveState =
             IUTransferService.getLiveState()
@@ -716,7 +897,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     private fun requestNotificationPermission() {
 
         if (
@@ -784,75 +964,69 @@ class MainActivity : ComponentActivity() {
 
     private fun setupNetworking() {
 
-        if (acceptor != null) {
+        if (discovery != null) {
             return
         }
 
-        acceptor =
-            IUAcceptor(
+        discovery =
+            NetworkDiscovery(
                 context = this,
-
-                onStarted = { port ->
-
-                    statusText =
-                        "Ready • port $port"
-
-                    discovery =
-                        NetworkDiscovery(
-                            context = this,
-                            servicePort = port,
-                            onDevicesChanged = {
-                                devices = it
-                            }
-                        )
-
-                    discovery?.start()
+                servicePort = 0,
+                onDevicesChanged = {
+                    devices = it
                 },
-
-                onFileReceived = {
-                    filename,
-                    _ ->
-
-                    statusText =
-                        "Received $filename"
-
-                    transferFileName =
-                        null
-
-                    transferProgress =
-                        0f
-                },
-
-                onProgress = {
-                    filename,
-                    received,
-                    total ->
-
-                    transferFileName =
-                        filename
-
-                    transferProgress =
-                        if (total > 0) {
-
-                            received.toFloat() /
-                                total.toFloat()
-
-                        } else {
-                            0f
-                        }
-                },
-
-                onError = { error ->
-
-                    statusText =
-                        "Error: ${
-                            error.message
-                                ?: "Unknown error"
-                        }"
-                }
+                advertiseSelf = false,
+                discoverServices = true
             )
 
-        acceptor?.start()
+        discovery?.start()
+
+        if (
+            !IUAcceptorService.isRunning()
+        ) {
+
+            startAcceptorService()
+
+        } else {
+
+            val port =
+                IUAcceptorService.getActivePort()
+
+            statusText =
+                if (port > 0) {
+                    "Ready • port $port"
+                } else {
+                    "Ready"
+                }
+        }
+    }
+
+    private fun startAcceptorService() {
+
+        val intent =
+            Intent(
+                this,
+                IUAcceptorService::class.java
+            ).apply {
+                action =
+                    IUAcceptorService.ACTION_START
+            }
+
+        if (
+            Build.VERSION.SDK_INT >=
+            Build.VERSION_CODES.O
+        ) {
+
+            startForegroundService(
+                intent
+            )
+
+        } else {
+
+            startService(
+                intent
+            )
+        }
     }
 
     private fun stopNetworking() {
@@ -860,10 +1034,6 @@ class MainActivity : ComponentActivity() {
         discovery?.stop()
 
         discovery = null
-
-        acceptor?.shutdown()
-
-        acceptor = null
 
         devices =
             emptyList()
@@ -1070,14 +1240,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun requestOverlayPermission() {
+
         startActivity(
             Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
+                Uri.parse(
+                    "package:$packageName"
+                )
             )
         )
     }
-
 }
 
 @Composable
