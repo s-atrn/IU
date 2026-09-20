@@ -77,7 +77,7 @@ IU is a personal project I created to ease my own workflow. I'm putting it as op
 The core wireless file-transfer functionality is operational, with additional features and improvements being developed over time.
 
 ## Features to add
-- [ ] Start acceptor at launch in windows
+- [x] Start acceptor at launch in windows
 - [ ] Notification for recieved files on Android even on app acceptor
 - [ ] Right click explorer integration in Windows (with list of devices in the dropdown itself)
 - [ ] Folder Transfers -> Directory manifest + individual files transfer
