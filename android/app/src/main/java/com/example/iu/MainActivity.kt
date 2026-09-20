@@ -140,29 +140,13 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onCreate(savedInstanceState)
 
-        if (
-            intent.getBooleanExtra(
-                "MINIMIZE_IU",
-                false
-            )
-        ) {
-            moveTaskToBack(true)
-            return
-        }
-
-        if (Settings.canDrawOverlays(this)) {
-            startService(
-                Intent(
-                    this,
-                    IUTouchLayerService::class.java
-                )
-            )
-        } else {
-            requestOverlayPermission()
-        }
-
         window.addFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+        )
+
+        window.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.MATCH_PARENT
         )
 
         if (hasNetworkPermission()) {
@@ -186,20 +170,14 @@ class MainActivity : ComponentActivity() {
                     Modifier
                         .fillMaxSize()
                         .clickable {
-                            stopService(
-                                Intent(
-                                    this@MainActivity,
-                                    IUTouchLayerService::class.java
-                                )
-                            )
                             moveTaskToBack(true)
                         }
             ) {
                 Box(
                     modifier = 
                         Modifier
-                            .fillMaxWidth(0.90f)
-                            .fillMaxHeight(0.45f)
+                            .fillMaxWidth(0.75f)
+                            .fillMaxHeight(0.42f)
                             .align(Alignment.Center)
                 ) {
                     Box(
@@ -1100,21 +1078,6 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    override fun onNewIntent(
-        intent: Intent,
-        caller: ComponentCaller
-    ) {
-        super.onNewIntent(intent, caller)
-
-        if (
-            intent.getBooleanExtra(
-                "MINIMIZE_IU",
-                false
-            )
-        ) {
-            moveTaskToBack(true)
-        }
-    }
 }
 
 @Composable

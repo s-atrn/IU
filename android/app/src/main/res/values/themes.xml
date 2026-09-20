@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.IU" parent="android:style/Theme.Material.Light.NoActionBar">
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:colorAccent">@android:color/transparent</item>
+    <style name="Theme.IU"
+        parent="android:style/Theme.Material.Light.NoActionBar">
+
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+
+        <item name="android:windowNoTitle">true</item>
+
+        <item name="android:windowBackground">
+            @android:color/transparent
+        </item>
+
         <item name="android:backgroundDimEnabled">false</item>
 
-        <item name="android:windowMinWidthMajor">0%</item>
-        <item name="android:windowMinWidthMinor">0%</item> 
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowContentTransitions">false</item>
+
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <item name="android:statusBarColor">
+            @android:color/transparent
+        </item>
+
+        <item name="android:navigationBarColor">
+            @android:color/transparent
+        </item>
+
+        <item name="android:colorAccent">
+            @android:color/transparent
+        </item>
+
     </style>
 
 </resources>
