@@ -89,8 +89,12 @@ The core wireless file-transfer functionality is operational, with additional fe
 - [ ] Windows app UI redesign to match android ui
 
 ## Bugs to fix
-- [ ] Blank area around the window is not clickable
+- [x] Blank area around the window is not clickable
 - [ ] Multiple recievers on Android
 - [ ] Scroll not present in Android
 - [ ] Notification bar lagging when recieving via quick tile reciever
+
+> **⚠️ Development Notice**
+>
+> The current release is behind the latest development version. It does not yet include the latest UI changes, stability improvements, and other ongoing updates. These changes will be included in a future release.
 
