@@ -112,18 +112,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-    /*
-     * IMPORTANT:
-     *
-     * Android must not receive the Nearby Wi-Fi
-     * and notification permission requests at
-     * the same time.
-     *
-     * Nearby Wi-Fi is requested first.
-     * Only after that result returns do we
-     * request notifications.
-     */
-
     private val networkPermissionLauncher =
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -153,17 +141,6 @@ class MainActivity : ComponentActivity() {
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
 
-        /*
-         * Permission order:
-         *
-         * 1. Nearby Wi-Fi
-         * 2. Notification
-         * 3. Networking
-         *
-         * This prevents Android/Samsung from
-         * dropping the second permission dialog.
-         */
-
         if (hasNetworkPermission()) {
             requestNotificationPermission()
         } else {
@@ -172,14 +149,6 @@ class MainActivity : ComponentActivity() {
 
         restoreTransferState()
 
-        /*
-         * Handle files shared into IU.
-         *
-         * This is done after the activity has been
-         * created so the shared files become the
-         * normal selected-file state used by the
-         * existing sender.
-         */
 
         handleIncomingShareIntent(intent)
 
@@ -605,11 +574,6 @@ class MainActivity : ComponentActivity() {
 
     private fun restoreTransferState() {
 
-        /*
-         * The running foreground service is authoritative.
-         * SharedPreferences is only a fallback when no
-         * transfer service is currently alive.
-         */
 
         val liveState =
             IUTransferService.getLiveState()
@@ -754,10 +718,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    /*
-     * Requests notification permission only after
-     * the Nearby Wi-Fi permission flow has finished.
-     */
 
     private fun requestNotificationPermission() {
 
@@ -1105,11 +1065,6 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onDestroy() {
-
-        /*
-         * Activity lifecycle must never control the
-         * foreground transfer service.
-         */
 
         stopNetworking()
 

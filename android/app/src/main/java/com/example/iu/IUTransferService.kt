@@ -210,10 +210,6 @@ class IUTransferService : Service() {
                     return START_NOT_STICKY
                 }
 
-                /*
-                 * Kill any previous sender before starting
-                 * a new transfer.
-                 */
                 sender?.stop()
                 sender?.shutdown()
                 sender = null
@@ -833,11 +829,6 @@ class IUTransferService : Service() {
         sender?.shutdown()
         sender = null
 
-        /*
-         * Do not write any transfer state here.
-         * Service destruction must not manufacture COMPLETE,
-         * FAILED, or IDLE.
-         */
         liveState = null
 
         super.onDestroy()
