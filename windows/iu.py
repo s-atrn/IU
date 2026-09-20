@@ -91,6 +91,7 @@ class IU:
         )
 
         self.discovery.start()
+        self.acceptor.start()
 
         tray_thread = threading.Thread(
             target=self._start_tray,
