@@ -2,6 +2,9 @@
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission
+        android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <!-- Network -->
 
     <uses-permission
@@ -98,6 +101,11 @@
             android:name=".IUAcceptorService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <!-- Full-screen IU touch layer -->
+        <service
+            android:name=".IUTouchLayerService"
+            android:exported="false" />
 
         <!-- Quick Settings tile -->
 

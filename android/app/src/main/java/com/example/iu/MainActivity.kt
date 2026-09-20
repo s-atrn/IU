@@ -1,5 +1,6 @@
 package com.example.iu
 
+import android.app.ComponentCaller
 import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -10,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.provider.Settings
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -24,6 +26,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -137,6 +140,27 @@ class MainActivity : ComponentActivity() {
     ) {
         super.onCreate(savedInstanceState)
 
+        if (
+            intent.getBooleanExtra(
+                "MINIMIZE_IU",
+                false
+            )
+        ) {
+            moveTaskToBack(true)
+            return
+        }
+
+        if (Settings.canDrawOverlays(this)) {
+            startService(
+                Intent(
+                    this,
+                    IUTouchLayerService::class.java
+                )
+            )
+        } else {
+            requestOverlayPermission()
+        }
+
         window.addFlags(
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
         )
@@ -159,290 +183,286 @@ class MainActivity : ComponentActivity() {
 
             Box(
                 modifier =
-                    Modifier.fillMaxSize()
+                    Modifier
+                        .fillMaxSize()
+                        .clickable {
+                            stopService(
+                                Intent(
+                                    this@MainActivity,
+                                    IUTouchLayerService::class.java
+                                )
+                            )
+                            moveTaskToBack(true)
+                        }
             ) {
-
                 Box(
-                    modifier =
+                    modifier = 
                         Modifier
-                            .fillMaxSize(0.857f)
+                            .fillMaxWidth(0.90f)
+                            .fillMaxHeight(0.45f)
                             .align(Alignment.Center)
-                            .dropShadow(
-                                shape = cardShape,
-                                shadow =
-                                    Shadow(
-                                        radius = 7.dp,
-                                        spread = 4.dp,
-                                        color =
-                                            Color.Black.copy(
-                                                alpha = 0.25f
-                                            ),
-                                        offset =
-                                            DpOffset(
-                                                x = 4.dp,
-                                                y = 4.dp
-                                            )
-                                    )
-                            )
-                            .background(
-                                brush =
-                                    Brush.verticalGradient(
-                                        colors =
-                                            listOf(
-                                                Color(
-                                                    50,
-                                                    50,
-                                                    53
-                                                ),
-                                                Color(
-                                                    18,
-                                                    18,
-                                                    20
-                                                )
-                                            )
-                                    ),
-                                shape = cardShape
-                            )
-                            .border(
-                                width = 1.dp,
-                                color =
-                                    Color(
-                                        130,
-                                        130,
-                                        145
-                                    ).copy(
-                                        alpha = 0.65f
-                                    ),
-                                shape = cardShape
-                            )
                 ) {
-
-                    Column(
+                    Box(
                         modifier =
                             Modifier
-                                .fillMaxSize()
-                                .padding(12.dp)
+                                .fillMaxSize(0.857f)
+                                .align(Alignment.Center)
+                                .dropShadow(
+                                    shape = cardShape,
+                                    shadow =
+                                        Shadow(
+                                            radius = 7.dp,
+                                            spread = 4.dp,
+                                            color =
+                                                Color.Black.copy(
+                                                    alpha = 0.25f
+                                                ),
+                                            offset =
+                                                DpOffset(
+                                                    x = 4.dp,
+                                                    y = 4.dp
+                                                )
+                                        )
+                                )
+                                .background(
+                                    brush =
+                                        Brush.verticalGradient(
+                                            colors =
+                                                listOf(
+                                                    Color(
+                                                        50,
+                                                        50,
+                                                        53
+                                                    ),
+                                                    Color(
+                                                        18,
+                                                        18,
+                                                        20
+                                                    )
+                                                )
+                                        ),
+                                    shape = cardShape
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color =
+                                        Color(
+                                            130,
+                                            130,
+                                            145
+                                        ).copy(
+                                            alpha = 0.65f
+                                        ),
+                                    shape = cardShape
+                                )
                     ) {
-
-                        Box(
-                            modifier =
-                                Modifier.fillMaxWidth(),
-                            contentAlignment =
-                                Alignment.Center
-                        ) {
-
-                            Text(
-                                text = "IU",
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight =
-                                    FontWeight.SemiBold,
-                                fontFamily =
-                                    appFont,
-                                letterSpacing =
-                                    0.5.sp
-                            )
-                        }
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(4.dp)
-                        )
-
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = Color.White
-                        )
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(10.dp)
-                        )
-
-                        Text(
-                            text = statusText,
-                            color =
-                                Color.White.copy(
-                                    alpha = 0.65f
-                                ),
-                            fontSize = 12.sp,
-                            fontFamily = appFont
-                        )
-
-                        Spacer(
-                            modifier =
-                                Modifier.height(8.dp)
-                        )
 
                         Column(
                             modifier =
                                 Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                            verticalArrangement =
-                                Arrangement.spacedBy(6.dp)
+                                    .fillMaxSize()
+                                    .padding(12.dp)
                         ) {
 
-                            if (devices.isEmpty()) {
+                            Box(
+                                modifier =
+                                    Modifier.fillMaxWidth(),
+                                contentAlignment =
+                                    Alignment.Center
+                            ) {
 
-                                Box(
-                                    modifier =
-                                        Modifier
-                                            .fillMaxWidth()
-                                            .weight(1f),
-                                    contentAlignment =
-                                        Alignment.Center
-                                ) {
-
-                                    Text(
-                                        text =
-                                            "No IU devices found",
-                                        color =
-                                            Color.White.copy(
-                                                alpha = 0.45f
-                                            ),
-                                        fontSize = 13.sp,
-                                        fontFamily =
-                                            appFont
-                                    )
-                                }
-
-                            } else {
-
-                                devices.forEach { device ->
-
-                                    DeviceRow(
-                                        device = device,
-                                        fontFamily =
-                                            appFont,
-                                        enabled =
-                                            selectedFileUris.isNotEmpty(),
-                                        onClick = {
-                                            sendToDevice(
-                                                device
-                                            )
-                                        }
-                                    )
-                                }
+                                Text(
+                                    text = "IU",
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontWeight =
+                                        FontWeight.SemiBold,
+                                    fontFamily =
+                                        appFont,
+                                    letterSpacing =
+                                        0.5.sp
+                                )
                             }
-                        }
 
-                        if (
-                            transferFileName != null
-                        ) {
+                            Spacer(
+                                modifier =
+                                    Modifier.height(4.dp)
+                            )
+
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = Color.White
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(10.dp)
+                            )
+
+                            Text(
+                                text = statusText,
+                                color =
+                                    Color.White.copy(
+                                        alpha = 0.65f
+                                    ),
+                                fontSize = 12.sp,
+                                fontFamily = appFont
+                            )
+
+                            Spacer(
+                                modifier =
+                                    Modifier.height(8.dp)
+                            )
 
                             Column(
                                 modifier =
                                     Modifier
                                         .fillMaxWidth()
-                                        .padding(
-                                            bottom = 8.dp
-                                        )
+                                        .weight(1f),
+                                verticalArrangement =
+                                    Arrangement.spacedBy(6.dp)
                             ) {
 
+                                if (devices.isEmpty()) {
+
+                                    Box(
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .weight(1f),
+                                        contentAlignment =
+                                            Alignment.Center
+                                    ) {
+
+                                        Text(
+                                            text =
+                                                "No IU devices found",
+                                            color =
+                                                Color.White.copy(
+                                                    alpha = 0.45f
+                                                ),
+                                            fontSize = 13.sp,
+                                            fontFamily =
+                                                appFont
+                                        )
+                                    }
+
+                                } else {
+
+                                    devices.forEach { device ->
+
+                                        DeviceRow(
+                                            device = device,
+                                            fontFamily =
+                                                appFont,
+                                            enabled =
+                                                selectedFileUris.isNotEmpty(),
+                                            onClick = {
+                                                sendToDevice(
+                                                    device
+                                                )
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (
+                                transferFileName != null
+                            ) {
+
+                                Column(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(
+                                                bottom = 8.dp
+                                            )
+                                ) {
+
+                                    Text(
+                                        text =
+                                            transferFileName!!,
+                                        color =
+                                            Color.White,
+                                        fontSize = 12.sp,
+                                        fontFamily =
+                                            appFont
+                                    )
+
+                                    Spacer(
+                                        modifier =
+                                            Modifier.height(5.dp)
+                                    )
+
+                                    LinearProgressIndicator(
+                                        progress =
+                                            { transferProgress },
+                                        modifier =
+                                            Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+
+                            ElevatedButton(
+                                onClick = {
+                                    filePicker.launch(
+                                        arrayOf("*/*")
+                                    )
+                                },
+                                modifier =
+                                    Modifier.fillMaxWidth()
+                            ) {
+
+                                val buttonText =
+                                    when {
+
+                                        selectedFileNames.isEmpty() ->
+                                            "+"
+
+                                        selectedFileNames.size == 1 ->
+                                            displayFileName(
+                                                selectedFileNames[0]
+                                            )
+
+                                        else ->
+                                            "${selectedFileNames.size} files selected"
+                                    }
+
                                 Text(
-                                    text =
-                                        transferFileName!!,
+                                    text = buttonText,
                                     color =
-                                        Color.White,
-                                    fontSize = 12.sp,
+                                        if (
+                                            selectedFileNames.isEmpty()
+                                        ) {
+                                            Color.Black
+                                        } else {
+                                            Color.DarkGray
+                                        },
+                                    fontSize =
+                                        if (
+                                            selectedFileNames.isEmpty()
+                                        ) {
+                                            20.sp
+                                        } else {
+                                            14.sp
+                                        },
+                                    fontWeight =
+                                        if (
+                                            selectedFileNames.isEmpty()
+                                        ) {
+                                            FontWeight.Bold
+                                        } else {
+                                            FontWeight.Normal
+                                        },
                                     fontFamily =
                                         appFont
                                 )
-
-                                Spacer(
-                                    modifier =
-                                        Modifier.height(5.dp)
-                                )
-
-                                LinearProgressIndicator(
-                                    progress =
-                                        { transferProgress },
-                                    modifier =
-                                        Modifier.fillMaxWidth()
-                                )
                             }
-                        }
-
-                        ElevatedButton(
-                            onClick = {
-                                filePicker.launch(
-                                    arrayOf("*/*")
-                                )
-                            },
-                            modifier =
-                                Modifier.fillMaxWidth()
-                        ) {
-
-                            val buttonText =
-                                when {
-
-                                    selectedFileNames.isEmpty() ->
-                                        "+"
-
-                                    selectedFileNames.size == 1 ->
-                                        displayFileName(
-                                            selectedFileNames[0]
-                                        )
-
-                                    else ->
-                                        "${selectedFileNames.size} files selected"
-                                }
-
-                            Text(
-                                text = buttonText,
-                                color =
-                                    if (
-                                        selectedFileNames.isEmpty()
-                                    ) {
-                                        Color.Black
-                                    } else {
-                                        Color.DarkGray
-                                    },
-                                fontSize =
-                                    if (
-                                        selectedFileNames.isEmpty()
-                                    ) {
-                                        20.sp
-                                    } else {
-                                        14.sp
-                                    },
-                                fontWeight =
-                                    if (
-                                        selectedFileNames.isEmpty()
-                                    ) {
-                                        FontWeight.Bold
-                                    } else {
-                                        FontWeight.Normal
-                                    },
-                                fontFamily =
-                                    appFont
-                            )
                         }
                     }
                 }
             }
-        }
-
-        val metrics =
-            resources.displayMetrics
-
-        val windowWidth =
-            (
-                metrics.widthPixels * 0.75f
-            ).toInt()
-
-        val windowHeight =
-            (
-                metrics.heightPixels * 0.42f
-            ).toInt()
-
-        window.decorView.post {
-
-            window.setLayout(
-                windowWidth,
-                windowHeight
-            )
         }
     }
 
@@ -1069,6 +1089,31 @@ class MainActivity : ComponentActivity() {
         stopNetworking()
 
         super.onDestroy()
+    }
+
+    private fun requestOverlayPermission() {
+        startActivity(
+            Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+        )
+    }
+
+    override fun onNewIntent(
+        intent: Intent,
+        caller: ComponentCaller
+    ) {
+        super.onNewIntent(intent, caller)
+
+        if (
+            intent.getBooleanExtra(
+                "MINIMIZE_IU",
+                false
+            )
+        ) {
+            moveTaskToBack(true)
+        }
     }
 }
 
