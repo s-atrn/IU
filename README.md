@@ -78,7 +78,7 @@ The core wireless file-transfer functionality is operational, with additional fe
 
 ## Features to add
 - [x] Start acceptor at launch in windows
-- [ ] Notification for recieved files on Android even on app acceptor
+- [x] Notification for recieved files on Android even on app acceptor
 - [ ] Right click explorer integration in Windows (with list of devices in the dropdown itself)
 - [ ] Folder Transfers -> Directory manifest + individual files transfer
 - [ ] Automatic retry in network failure
@@ -90,9 +90,9 @@ The core wireless file-transfer functionality is operational, with additional fe
 
 ## Bugs to fix
 - [x] Blank area around the window is not clickable
-- [ ] Multiple recievers on Android
+- [x] Multiple recievers on Android
+- [x] Notification bar lagging when recieving via quick tile reciever
 - [ ] Scroll not present in Android
-- [ ] Notification bar lagging when recieving via quick tile reciever
 
 > **⚠️ Development Notice**
 >
