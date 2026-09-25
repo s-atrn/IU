@@ -92,7 +92,7 @@ The core wireless file-transfer functionality is operational, with additional fe
 - [x] Blank area around the window is not clickable
 - [x] Multiple recievers on Android
 - [x] Notification bar lagging when recieving via quick tile reciever
-- [ ] Scroll not present in Android
+- [x] Scroll not present in Android
 
 > **⚠️ Development Notice**
 >

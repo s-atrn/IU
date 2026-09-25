@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
@@ -426,42 +428,41 @@ class MainActivity : ComponentActivity() {
                                     Modifier.height(8.dp)
                             )
 
-                            Column(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .weight(1f),
-                                verticalArrangement =
-                                    Arrangement.spacedBy(6.dp)
-                            ) {
+                            if (devices.isEmpty()) {
 
-                                if (devices.isEmpty()) {
+                                Box(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                    contentAlignment =
+                                        Alignment.Center
+                                ) {
 
-                                    Box(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .weight(1f),
-                                        contentAlignment =
-                                            Alignment.Center
-                                    ) {
+                                    Text(
+                                        text =
+                                            "No IU devices found",
+                                        color =
+                                            Color.White.copy(
+                                                alpha = 0.45f
+                                            ),
+                                        fontSize = 13.sp,
+                                        fontFamily =
+                                            appFont
+                                    )
+                                }
 
-                                        Text(
-                                            text =
-                                                "No IU devices found",
-                                            color =
-                                                Color.White.copy(
-                                                    alpha = 0.45f
-                                                ),
-                                            fontSize = 13.sp,
-                                            fontFamily =
-                                                appFont
-                                        )
-                                    }
+                            } else {
 
-                                } else {
-
-                                    devices.forEach { device ->
+                                LazyColumn(
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .weight(1f),
+                                    verticalArrangement =
+                                        Arrangement.spacedBy(6.dp)
+                                ) {
+                                    items(devices) { device ->
 
                                         DeviceRow(
                                             device = device,
