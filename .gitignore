@@ -58,8 +58,12 @@ dist/
 installer/
 *.apk
 *.exe
+windows/IU.iss
+windows/IU.spec
 
 # Android signing
 *.jks
 *.keystore
 key.properties
+android/keystore.properties
+android/app/build.gradle.kts

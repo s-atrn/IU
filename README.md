@@ -80,14 +80,15 @@ The core wireless file-transfer functionality is operational, with additional fe
 
 * [x] Start acceptor at launch in windows
 * [x] Notification for recieved files on Android even on app acceptor
-* [ ] Right click explorer integration in Windows (with list of devices in the dropdown itself)
-* [ ] Folder Transfers *> Directory manifest + individual files transfer
+* [ ] Folder Transfers -> Directory manifest + individual files transfer
 * [ ] Automatic retry in network failure
 * [ ] Windows app UI redesign to match android ui
 * [ ] Transfer cancellation (crucial for large file transfers)
 * [ ] Custom device naming
 * [ ] Set custom recieved files location
 * [ ] Drag and drop on windows
+* [ ] Send text
+* [ ] Right click explorer integration in Windows (with list of devices in the dropdown itself - possible only when device discovery is fixed)
 
 ## Bugs to fix
 
