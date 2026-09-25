@@ -1051,17 +1051,19 @@ class IUWindow:
         self,
         event=None,
     ):
-        if self.acceptor.running:
-            threading.Thread(
-                target=self.acceptor.stop,
-                daemon=True,
-            ).start()
+        def worker():
+            if self.acceptor.running:
+                self.acceptor.stop()
+            else:
+                self.acceptor.start()
+            
+            # Instantly redraw the window on the main thread after toggle completes
+            self.root.after(0, self._draw)
 
-        else:
-            threading.Thread(
-                target=self.acceptor.start,
-                daemon=True,
-            ).start()
+        threading.Thread(
+            target=worker,
+            daemon=True,
+        ).start()
 
     # =========================================================
     # FILE SELECTION
