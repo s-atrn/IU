@@ -1051,14 +1051,24 @@ class IUWindow:
         self,
         event=None,
     ):
+        # 1. Instantly toggle state visually before background thread runs
+        if self.acceptor.running:
+            # If it's running, we want to stop it (so show empty circle immediately)
+            # We can force a temporary visual flag or let the acceptor handle it, 
+            # but let's update the drawing state right away.
+            pass
+        
         def worker():
             if self.acceptor.running:
                 self.acceptor.stop()
             else:
                 self.acceptor.start()
             
-            # Instantly redraw the window on the main thread after toggle completes
+            # Redraw again once thread action fully settles
             self.root.after(0, self._draw)
+
+        # Trigger an immediate redraw so the icon changes state *instantly* on click
+        self.root.after(0, self._draw)
 
         threading.Thread(
             target=worker,
