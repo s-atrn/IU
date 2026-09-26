@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import shutil
 import re
 
 # --- CONFIGURATION ---
@@ -19,7 +20,7 @@ def run_command(command):
 
 def update_iss_version(iss_path, version_str):
     print(f"\n[UPDATING] Setting version in {iss_path} to {version_str}...")
-    clean_version = version_str.lstrip('v') # Converts "v1.1.0" to "1.1.0" for Windows
+    clean_version = version_str.lstrip('v')
     
     if not os.path.exists(iss_path):
         print(f"[ERROR] Could not find {iss_path}")
@@ -35,6 +36,37 @@ def update_iss_version(iss_path, version_str):
         f.write(content)
     print("[SUCCESS] IU.iss version updated successfully.")
 
+def force_windowed_spec():
+    print("\n[CONFIG] Generating and locking spec file to windowed mode...")
+    
+    # Clean old build folders
+    if os.path.exists("build"):
+        shutil.rmtree("build")
+        
+    # Step 1: Generate the spec file using makespec (removed invalid --noconfirm flag)
+    makespec_cmd = [
+        sys.executable, "-m", "PyInstaller.utils.cliutils.makespec",
+        "--onefile",
+        "--windowed",
+        f"--icon={ICON_PATH}",
+        APP_NAME
+    ]
+    run_command(makespec_cmd)
+    
+    # Step 2: Read iu.spec and forcibly ensure console=False
+    if os.path.exists("iu.spec"):
+        with open("iu.spec", "r", encoding="utf-8") as f:
+            spec_content = f.read()
+            
+        if "console=True" in spec_content:
+            spec_content = spec_content.replace("console=True", "console=False")
+        elif "console=False" not in spec_content:
+            spec_content = spec_content.replace("app.scripts,", "app.scripts,\n    console=False,")
+            
+        with open("iu.spec", "w", encoding="utf-8") as f:
+            f.write(spec_content)
+        print("[SUCCESS] iu.spec locked to console=False.")
+
 def main():
     print("=== IU Windows Build & Release Automation ===")
     
@@ -47,24 +79,20 @@ def main():
     
     print(f"\nStarting Windows Build Process for {VERSION} ===")
     
-    # Step 1: Build Executable with PyInstaller
-    pyinstaller_cmd = [
-        sys.executable, "-m", "PyInstaller",
-        "--onefile",
-        "--windowed",
-        "--noconfirm",
-        f"--icon={ICON_APP if 'ICON_APP' in locals() else ICON_PATH}",
-        APP_NAME
-    ]
-    # Quick fix for icon argument name matching
-    pyinstaller_cmd[4] = f"--icon={ICON_PATH}"
+    # Step 1: Generate spec, force console=False, and build from spec
+    force_windowed_spec()
     
-    run_command(pyinstaller_cmd)
+    build_spec_cmd = [
+        sys.executable, "-m", "PyInstaller",
+        "--noconfirm",
+        "iu.spec"
+    ]
+    run_command(build_spec_cmd)
     
     # Step 2: Update Inno Setup script with the new version
     update_iss_version(ISS_FILE, VERSION)
     
-    # Step 3: Compile Inno Setup Installer using hardcoded path
+    # Step 3: Compile Inno Setup Installer
     if not os.path.exists(ISCC_PATH):
         print(f"[ERROR] Could not find ISCC.exe at hardcoded path: {ISCC_PATH}")
         sys.exit(1)
